@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/posts/';
+const API_URL = 'http://lebadvisor.pythonanywhere.com/api/posts/';
 
 class PostService {
   getPosts() {
