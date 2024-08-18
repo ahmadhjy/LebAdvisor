@@ -17,7 +17,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -25,17 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-%fh+-lrqi_@slz$whkktpop1-hq$+jeah6=+=hk%97sb4m%lol"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["lebadvisor.pythonanywhere.com"]
+
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "https://lebadvisor.pythonanywhere.com"
 ]
-AUTH_USER_MODEL = "users.CustomUser"
-# Application definition
 
+AUTH_USER_MODEL = "users.CustomUser"
+
+# Application definition
 INSTALLED_APPS = [
     "rest_framework",
     "knox",
@@ -80,7 +80,6 @@ TINYMCE_DEFAULT_CONFIG = {
     'convert_urls': True,
 }
 
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -112,7 +111,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "knox.auth.TokenAuthentication",
@@ -128,11 +126,14 @@ REST_KNOX = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "ghaithtravel$default",
+        "USER": "ghaithtravel",
+        "PASSWORD": "askl23@as",
+        "HOST": "ghaithtravel.mysql.pythonanywhere-services.com",  # Often 'localhost' for local, 'your-mysql-host' for remote
+        "PORT": "3306",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -152,13 +153,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Beirut"
 
 USE_I18N = True
 
@@ -168,12 +168,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # For serving static files in production
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -181,3 +181,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Additional settings for PythonAnywhere
+CSRF_TRUSTED_ORIGINS = ["https://lebadvisor.pythonanywhere.com"]
