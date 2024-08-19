@@ -24,13 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-%fh+-lrqi_@slz$whkktpop1-hq$+jeah6=+=hk%97sb4m%lol"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["lebadvisor.pythonanywhere.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "https://lebadvisor.pythonanywhere.com"
+    "http://localhost:3000",
+    "http://localhost:8000"
 ]
 
 AUTH_USER_MODEL = "users.CustomUser"
@@ -126,12 +127,8 @@ REST_KNOX = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ghaithtravel$default",
-        "USER": "ghaithtravel",
-        "PASSWORD": "askl23@as",
-        "HOST": "ghaithtravel.mysql.pythonanywhere-services.com",  # Often 'localhost' for local, 'your-mysql-host' for remote
-        "PORT": "3306",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -172,7 +169,6 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # For serving static files in production
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build', 'static')]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -181,6 +177,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Additional settings for PythonAnywhere
-CSRF_TRUSTED_ORIGINS = ["https://lebadvisor.pythonanywhere.com"]
