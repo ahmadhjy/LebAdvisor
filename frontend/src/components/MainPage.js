@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './MainPage.css';
 import Card from './Card';
-import { FaStar, FaClock, FaGift, FaHiking, FaMapSigns, FaBoxOpen, FaMap, FaBox, FaWalking } from 'react-icons/fa';
-import SearchBar from './SearchBar';  // Import the SearchBar component
+import {FaGift, FaHiking, FaMapSigns, FaBoxOpen, FaMap, FaBox, FaWalking } from 'react-icons/fa';
+import SearchBar from './SearchBar';
 
 const MainPage = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);

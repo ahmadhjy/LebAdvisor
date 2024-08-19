@@ -121,7 +121,7 @@ const Navbar = () => {
       <Toolbar>
         <Typography onClick={() => navigate('/')} variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Logo className='lb-logo'
-            src="/lebadvisor_logo.png" 
+            src="/media/lebadvisor_logo.png" 
             alt="LebAdvisor Logo" 
           />
         </Typography>
