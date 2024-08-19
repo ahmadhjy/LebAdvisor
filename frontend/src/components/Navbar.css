@@ -98,3 +98,19 @@
     }
   }
   
+.register-button {
+  font-size: 16px !important; /* Default size */
+  padding: 10px 20px !important; /* Default padding */
+  width: 100% !important; /* Full width for mobile */
+  margin: 10px 0 !important; /* Space around the button */
+}
+
+@media (max-width: 600px) {
+  .register-button {
+    font-size: 10px !important; /* Smaller font size for mobile */
+    padding: 8px 16px !important; /* Adjust padding for mobile */
+    width: 90% !important; /* Reduce width slightly for better alignment */
+    margin: 15px auto !important; /* Center the button */
+    display: block !important; /* Ensure block display */
+  }
+}

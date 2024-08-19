@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@mui/material';
 import api from '../services/api.js';
+import './Navbar.css';
 
 const AuthPopup = () => {
 
@@ -125,7 +126,7 @@ const AuthPopup = () => {
       {loggedInUser ? (
         <Typography variant="h6">Hello, {loggedInUser}</Typography>
       ) : (
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+        <Button variant="contained" color="primary" className="register-button" onClick={handleClickOpen}>
           Login / Register
         </Button>
       )}
