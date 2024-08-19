@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.5601c65f.css",
-    "main.js": "/static/js/main.684555f4.js",
-    "static/media/beirut3.jpg": "/static/media/beirut3.61b2892379c8bfecfd9e.jpg",
-    "static/media/beirut.jpg": "/static/media/beirut.efc9a29851992c309ced.jpg",
-    "static/media/main-banner.jpg": "/static/media/main-banner.b2f586aa845eac87ce4f.jpg",
-    "static/media/featured.jpg": "/static/media/featured.ea0c81c68ee1d765195a.jpg",
-    "index.html": "/index.html",
-    "main.5601c65f.css.map": "/static/css/main.5601c65f.css.map",
-    "main.684555f4.js.map": "/static/js/main.684555f4.js.map"
+    "main.css": "/media/static/css/main.584dba53.css",
+    "main.js": "/media/static/js/main.684555f4.js",
+    "static/media/beirut3.jpg": "/media/static/media/beirut3.61b2892379c8bfecfd9e.jpg",
+    "static/media/beirut.jpg": "/media/static/media/beirut.efc9a29851992c309ced.jpg",
+    "static/media/main-banner.jpg": "/media/static/media/main-banner.b2f586aa845eac87ce4f.jpg",
+    "static/media/featured.jpg": "/media/static/media/featured.ea0c81c68ee1d765195a.jpg",
+    "index.html": "/media/index.html",
+    "main.584dba53.css.map": "/media/static/css/main.584dba53.css.map",
+    "main.684555f4.js.map": "/media/static/js/main.684555f4.js.map"
   },
   "entrypoints": [
-    "static/css/main.5601c65f.css",
+    "static/css/main.584dba53.css",
     "static/js/main.684555f4.js"
   ]
 }
