@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { Snackbar, Alert, Button, TextField, MenuItem } from "@mui/material";
 import api, { MainUrl } from "../services/api";
 import "./Details.css";
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import CustomDatePicker from "./booking/CustomDatePicker";
 import PeriodsDropdown from "./booking/PeriodsDropdown";
-import MenuItem from '@mui/material/MenuItem';
 import ImageCatalog from "./ImageCatalog";
 import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaUsers, FaDollarSign, FaExclamationCircle, FaArrowDown, FaHeart, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
@@ -22,9 +20,17 @@ const ActivityDetails = () => {
     const [selectedOffer, setSelectedOffer] = useState(null);
     const [imageLinks, setImageLinks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [loginPrompt, setLoginPrompt] = useState(false); // For login prompt
     const navigate = useNavigate();
 
+    const loggedInUser = localStorage.getItem('username');
+
     const handleBooking = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             const data = { period_id: selectedPeriod.id, quantity };
             const response = await api.post('/api/bookingactivity/', data);
@@ -46,11 +52,9 @@ const ActivityDetails = () => {
                 const links = response.data.catalogs.map(catalog => `${MainUrl}${catalog.image}`);
                 setImageLinks(links);
 
-                // Check if the activity is already a favorite
                 const favoriteResponse = await api.get(`/api/favorite-activity/${id}/`);
                 setIsFavorite(favoriteResponse.data.is_favorite);
 
-                // Fetch offers for the activity
                 const offersResponse = await api.get(`/api/activity/${id}/offers/`);
                 setOffers(offersResponse.data);
             } catch (error) {
@@ -68,6 +72,11 @@ const ActivityDetails = () => {
     }, [quantity, selectedPeriod]);
 
     const toggleFavorite = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             if (isFavorite) {
                 await api.delete(`/api/favorite-activity/${id}/`);
@@ -80,9 +89,12 @@ const ActivityDetails = () => {
         }
     };
 
-    const toggleFaq = () => {
-        const faqContent = document.querySelector('.faq-content');
-        faqContent.classList.toggle('show');
+    const handleDateChange = (date) => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+        setSelectedDate(date);
     };
 
     const handleOfferChange = (event) => {
@@ -92,10 +104,24 @@ const ActivityDetails = () => {
         setSelectedPeriod(null); // Reset selected period when changing the offer
     };
 
+    const toggleFaq = () => {
+        const faqContent = document.querySelector('.faq-content');
+        faqContent.classList.toggle('show');
+    };
+
     if (!activity) return <div>Loading...</div>;
 
     return (
         <div className="details-box">
+            <Snackbar
+                open={loginPrompt}
+                autoHideDuration={6000}
+                onClose={() => setLoginPrompt(false)}
+            >
+                <Alert onClose={() => setLoginPrompt(false)} severity="warning" sx={{ width: '100%' }}>
+                    Please log in to continue.
+                </Alert>
+            </Snackbar>
             <div className="background-blur" style={{
                 backgroundImage: `url(${MainUrl}/${activity.image})`,
             }}>
@@ -115,13 +141,13 @@ const ActivityDetails = () => {
                     className="details-image"
                 />
                 <ImageCatalog imageLinks={imageLinks} />
-                <div className="booking-container">
+                <div className="booking-offer">
                     <h2 className="booking-form-title">Book This Activity Now!</h2>
                     <CustomDatePicker
                         from={new Date().toISOString().split('T')[0]}
                         to={activity.available_to}
                         daysOff={activity.days_off}
-                        onDateChange={setSelectedDate}
+                        onDateChange={handleDateChange}
                     />
                     {selectedDate && (
                         <>
@@ -223,14 +249,6 @@ const ActivityDetails = () => {
                             </ul>
                         </div>
                     </div>
-                    <p className="map-container">
-                        <FaMapMarkerAlt color="orange" /> <strong>Activity location:</strong>
-                        <div
-                            style={{
-                                borderLeft: "6px solid orange",
-                            }}
-                            dangerouslySetInnerHTML={{ __html: activity.map }} />
-                    </p>
                     <p className="cancellation-policy">
                         <FaExclamationCircle className="icon" /> <strong>Cancellation policy:</strong> {activity.cancellation_policy}
                     </p>
@@ -239,6 +257,14 @@ const ActivityDetails = () => {
                     </p>
                     <p>
                         <FaUsers className="icon" /> <strong>Participant age range:</strong> {activity.participant_age_range}
+                    </p>
+                    <p className="map-container">
+                        <FaMapMarkerAlt color="orange" /> <strong>Activity location:</strong>
+                        <div
+                            style={{
+                                borderLeft: "6px solid orange",
+                            }}
+                            dangerouslySetInnerHTML={{ __html: activity.map }} />
                     </p>
                     <div className="faq-container">
                         <p className="faq-title" onClick={toggleFaq}>
@@ -260,4 +286,3 @@ const ActivityDetails = () => {
 };
 
 export default ActivityDetails;
-

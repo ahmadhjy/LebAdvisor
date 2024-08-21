@@ -104,6 +104,7 @@ body{
 
 .container {
   margin-top: 30px !important;
+  margin-bottom: 50px;
   width: 100% !important;
 }
 
@@ -142,8 +143,6 @@ body{
   display: grid;
   grid-gap: 30px;
   background-color: transparent;
-  padding-left: 25%;
-  padding-right: 25%;
   padding-bottom: 30px;
   margin: 30px 0px;
 }
@@ -169,6 +168,10 @@ body{
   text-align: left;
 }
 
+.booking-cards{
+  margin-bottom: 50px;
+}
+
 .booking-card h2{
   font-weight: 700;
   color: #ff7a2d;
@@ -181,7 +184,7 @@ body{
 
 .booking-image {
   width: 100%;
-  height: auto;
+  height: 200px;
   object-fit: cover;
 }
 

@@ -30,8 +30,6 @@ const PeriodsDropdown = ({ selectedDate, offerId, setSelectedPeriod, selectedPer
 
   return (
     <>
-      <br />
-      <br />
       <TextField
         select
         label="Select Period"

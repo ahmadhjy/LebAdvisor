@@ -255,9 +255,15 @@
 }
 
 /* Booking section */
-.booking-container {
+.booking-offer {
   text-align: center;
   margin-top: 30px;
+  padding-bottom: 50px;
+  display: grid;
+  grid-gap: 30px;
+  margin: auto;
+  width: 50%;
+  align-self:center ;
 }
 
 .booking-form-title {
@@ -322,6 +328,10 @@ button.MuiButton-contained:hover {
 
 .details-title {
   font-size: 1.8rem;
+}
+
+.booking-offer{
+  width: 100%;
 }
 
 .booking-form-title {

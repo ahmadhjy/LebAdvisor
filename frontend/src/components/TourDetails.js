@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField, MenuItem } from "@mui/material";
+import { Button, TextField, MenuItem, Snackbar, Alert } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import { format } from 'date-fns'; // Import format from date-fns
+import { format } from 'date-fns'; 
 import api, { MainUrl } from "../services/api";
 import {
     FaCalendarAlt, FaMapMarkerAlt, FaClock, FaUsers, FaDollarSign,
     FaExclamationCircle, FaArrowDown, FaVolumeUp, FaHeart, FaCheckCircle, FaTimesCircle, FaListUl
 } from 'react-icons/fa';
 import ImageCatalog from "./ImageCatalog";
-import TourDatePicker from "./booking/TourDatePicker"; // Importing the TourDatePicker component
+import TourDatePicker from "./booking/TourDatePicker"; 
 import "./Details.css";
 
 const TourDetails = () => {
@@ -21,9 +21,17 @@ const TourDetails = () => {
     const [quantity, setQuantity] = useState(1);
     const [totalPrice, setTotalPrice] = useState(0);
     const [availableDates, setAvailableDates] = useState([]);
+    const [loginPrompt, setLoginPrompt] = useState(false);
     const navigate = useNavigate();
 
+    const loggedInUser = localStorage.getItem('username');
+
     const handleBooking = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             if (selectedTourDay) {
                 if (selectedTourDay.stock >= quantity) {
@@ -53,7 +61,6 @@ const TourDetails = () => {
                 const links = response.data.catalogs.map(catalog => `${MainUrl}${catalog.image}`);
                 setImageLinks(links);
 
-                // Check if the tour is already a favorite
                 const favoriteResponse = await api.get(`/api/favorite-tour/${id}/`);
                 setIsFavorite(favoriteResponse.data.is_favorite);
             } catch (error) {
@@ -89,6 +96,11 @@ const TourDetails = () => {
     }, [quantity, selectedTourDay]);
 
     const toggleFavorite = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             if (isFavorite) {
                 await api.delete(`/api/favorite-tour/${id}/`);
@@ -115,22 +127,34 @@ const TourDetails = () => {
         const offerId = event.target.value;
         const offer = tour.offers.find(offer => offer.id === parseInt(offerId));
         setSelectedOffer(offer);
-        setSelectedTourDay(null);  // Reset selected tour day when changing the offer
-        setAvailableDates([]);  // Clear out previous tour days
+        setSelectedTourDay(null);
+        setAvailableDates([]);
     };
 
     const handleDateChange = (date) => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         const tourDay = availableDates.find(day => day.date === date);
         setSelectedTourDay(tourDay);
-        setQuantity(1); // Reset quantity when changing the tour day
+        setQuantity(1);
     };
 
     if (!tour) return <div>Loading...</div>;
 
     return (
-        <div className="details-box" style={{
-            backgroundImage: `url(${MainUrl}/${tour.image})`,
-        }}>
+        <div className="details-box" style={{ backgroundImage: `url(${MainUrl}/${tour.image})` }}>
+            <Snackbar
+                open={loginPrompt}
+                autoHideDuration={6000}
+                onClose={() => setLoginPrompt(false)}
+            >
+                <Alert onClose={() => setLoginPrompt(false)} severity="warning" sx={{ width: '100%' }}>
+                    Please log in to continue.
+                </Alert>
+            </Snackbar>
             <div className="gradient-overlay"></div>
             <div className="details-container">
                 <div className="details-header">
@@ -147,8 +171,8 @@ const TourDetails = () => {
                 />
                 <hr />
                 <ImageCatalog imageLinks={imageLinks} />
-                <div className="booking-container">
-                    <h2>Book This Tour</h2>
+                <div className="booking-offer">
+                    <h2 className="booking-form-title">Book This Tour</h2>
                     <TextField
                         select
                         label="Select Offer"
@@ -215,27 +239,6 @@ const TourDetails = () => {
                     <p>
                         <FaClock className="icon" /> <strong>Duration:</strong> {tour.period} hours
                     </p>
-                    <p className="map-container">
-                        <FaMapMarkerAlt className="icon" /> <strong>Pickup location:</strong>
-                        <div
-                            className="map-container"
-                            style={{
-                                borderLeft: "6px solid orange"
-                            }}
-                            dangerouslySetInnerHTML={{ __html: tour.pickup_location }} />
-                    </p>
-                    <p>
-                        <FaClock className="icon" /> <strong>Pickup time:</strong> {tour.pickup_time}
-                    </p>
-                    <p>
-                        <FaClock className="icon" /> <strong>Dropoff time:</strong> {tour.dropoff_time}
-                    </p>
-                    <p>
-                        <FaVolumeUp className="icon" /> <strong>Languages:</strong> {tour.languages}
-                    </p>
-                    <p>
-                        <FaUsers className="icon" /> <strong>Minimum age:</strong> {tour.min_age}
-                    </p>
                     <div className="included-excluded-container">
                         <div className="included-excluded-card">
                             <p><strong>Included:</strong></p>
@@ -262,7 +265,10 @@ const TourDetails = () => {
                         <FaExclamationCircle className="icon" /> <strong>Cancellation policy:</strong> {tour.cancellation_policy}
                     </p>
                     <p>
-                        <FaExclamationCircle className="icon" /> <strong>Additional info:</strong> {tour.additional_info}
+                        <FaVolumeUp className="icon" /> <strong>Languages:</strong> {tour.languages}
+                    </p>
+                    <p>
+                        <FaUsers className="icon" /> <strong>Minimum age:</strong> {tour.min_age}
                     </p>
                     <div className="itinerary-container">
                         <p className="itinerary-title">
@@ -279,6 +285,15 @@ const TourDetails = () => {
                             </div>
                         ))}
                     </div>
+                    <p className="map-container">
+                        <FaMapMarkerAlt className="icon" /> <strong>Pickup location:</strong>
+                        <div
+                            className="map-container"
+                            style={{
+                                borderLeft: "6px solid orange"
+                            }}
+                            dangerouslySetInnerHTML={{ __html: tour.pickup_location }} />
+                    </p>
                     <div className="faq-container">
                         <p className="faq-title" onClick={toggleFaq}>
                             FAQs <FaArrowDown className="faq-arrow" />
@@ -299,4 +314,3 @@ const TourDetails = () => {
 };
 
 export default TourDetails;
-

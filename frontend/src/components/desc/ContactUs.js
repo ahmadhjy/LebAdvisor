@@ -25,16 +25,18 @@ const ContactUs = () => {
                 </div>
             </div>
 
-            <iframe
-                id="JotFormIFrame-242277018965464"
-                title="Contact LebAdvisor"
-                onLoad={() => window.parent.scrollTo(0, 0)}
-                allowTransparency="true"
-                allow="geolocation; microphone; camera; fullscreen"
-                src="https://form.jotform.com/242277018965464"
-                frameBorder="0"
-                scrolling="no"
-            ></iframe>
+            <div className="form-container">
+                <iframe
+                    className="contact-iframe"
+                    title="Contact LebAdvisor"
+                    onLoad={() => window.parent.scrollTo(0, 0)}
+                    allowTransparency="true"
+                    allow="geolocation; microphone; camera; fullscreen"
+                    src="https://form.jotform.com/242277018965464"
+                    frameBorder="0"
+                    scrolling="no"
+                ></iframe>
+            </div>
         </div>
     );
 };

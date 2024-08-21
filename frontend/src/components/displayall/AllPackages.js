@@ -82,7 +82,7 @@ const AllPackages = () => {
   });
 
   return (
-    <div className="container">
+    <div className="all-container">
       <div className="filters">
         <h3>Filters</h3>
         <div className="filter-group">

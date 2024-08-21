@@ -1,5 +1,5 @@
 /* Main container for the page */
-.container {
+.all-container {
   display: flex;
   flex-direction: row;
   padding: 50px 20px;

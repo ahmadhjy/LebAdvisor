@@ -26,7 +26,7 @@ const SupplierBookingPage = () => {
     const [activityBookings, setActivityBookings] = useState([]);
     const [packageBookings, setPackageBookings] = useState([]);
     const [tourBookings, setTourBookings] = useState([]);
-    const [dashboardData, setDashboardData] = useState(null);
+    const [dashboardData, setDashboardData] = useState({});
     const [filter, setFilter] = useState('all');
 
     const [bookingData, setBookingData] = useState([]);
@@ -42,10 +42,10 @@ const SupplierBookingPage = () => {
             const toursResponse = await api.get('/api/supplier/toursb/');
             const dashboardResponse = await api.get('/api/supplier-dashboard');
             
-            setActivityBookings(activitiesResponse.data);
-            setPackageBookings(packagesResponse.data);
-            setTourBookings(toursResponse.data);
-            setDashboardData(dashboardResponse.data);
+            setActivityBookings(activitiesResponse.data || []);
+            setPackageBookings(packagesResponse.data || []);
+            setTourBookings(toursResponse.data || []);
+            setDashboardData(dashboardResponse.data || {});
 
             // Fetch data for charts
             const bookingsPerMonth = await api.get('/api/supplier/bookings-per-month/');
@@ -83,7 +83,7 @@ const SupplierBookingPage = () => {
         }
     };
 
-    const filterBookings = (bookings) => {
+    const filterBookings = (bookings = []) => {
         if (filter === 'all') return bookings;
         return bookings.filter(booking => {
             if (filter === 'paid') return booking.paid;
@@ -94,7 +94,7 @@ const SupplierBookingPage = () => {
         });
     };
 
-    const renderBookingList = (bookings, type) => (
+    const renderBookingList = (bookings = [], type) => (
         <Grid container spacing={2}>
             {bookings.length > 0 ? filterBookings(bookings).map(booking => {
                 const imageUrl = booking.period?.activity_offer?.activity?.image || booking.tourday?.tour_offer?.tour?.image || booking.package_offer?.package?.image;
@@ -231,7 +231,7 @@ const SupplierBookingPage = () => {
                         <Card className="summary-card">
                             <CardContent className='unconfirmed'>
                                 <Typography className="card-title">
-                                    <FaTimes className="unconfirmed-icon" /> Unconfirmed Bookings: {dashboardData.unconfirmed_bookings}
+                                    <FaTimes className="unconfirmed-icon" /> Unconfirmed Bookings: {dashboardData.unconfirmed_bookings || 0}
                                 </Typography>
                             </CardContent>
                         </Card>
@@ -243,7 +243,7 @@ const SupplierBookingPage = () => {
                                 <Typography className="card-title">
                                 Today's Customers
                                 </Typography>
-                                {dashboardData.todays_customers.length > 0 ? (
+                                {dashboardData.todays_customers && dashboardData.todays_customers.length > 0 ? (
                                     dashboardData.todays_customers.map((customer, index) => (
                                         <div key={index}>
                                             <Typography className="customer-info">
@@ -312,7 +312,7 @@ const SupplierBookingPage = () => {
                 </Select>
             </FormControl>
             <Grid container spacing={4} direction="column">
-                <Grid item>
+                <Grid item className="booking-cards">
                     <Card className="booking-card">
                         <CardHeader title={<><FaBookmark className="icon-inline" /> Activity Bookings</>} />
                         <CardContent>
@@ -320,7 +320,7 @@ const SupplierBookingPage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item>
+                <Grid item className="booking-cards">
                     <Card className="booking-card">
                         <CardHeader title={<><FaBoxOpen className="icon-inline" /> Package Bookings</>} />
                         <CardContent>
@@ -328,7 +328,7 @@ const SupplierBookingPage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item>
+                <Grid item className="booking-cards">
                     <Card className="booking-card">
                         <CardHeader title={<><FaRoute className="icon-inline" /> Tour Bookings</>} />
                         <CardContent>

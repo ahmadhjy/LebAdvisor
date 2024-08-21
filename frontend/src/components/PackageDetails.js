@@ -21,10 +21,18 @@ const PackageDetails = () => {
     const [quantity, setQuantity] = useState(1);
     const [totalPrice, setTotalPrice] = useState(0);
     const [availableDates, setAvailableDates] = useState([]);
-    const [errorMessage, setErrorMessage] = useState(''); // Add this line
+    const [loginPrompt, setLoginPrompt] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
+    const loggedInUser = localStorage.getItem('username');
+
     const handleBooking = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             if (selectedPackageDay) {
                 if (selectedPackageDay.stock >= quantity) {
@@ -87,6 +95,11 @@ const PackageDetails = () => {
     }, [quantity, selectedPackageDay]);
 
     const toggleFavorite = async () => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
         try {
             if (isFavorite) {
                 await api.delete(`/api/favorite-package/${id}/`);
@@ -99,6 +112,25 @@ const PackageDetails = () => {
         }
     };
 
+    const handleOfferChange = (event) => {
+        const offerId = event.target.value;
+        const offer = pkg.offers.find(offer => offer.id === parseInt(offerId));
+        setSelectedOffer(offer);
+        setSelectedPackageDay(null);
+        setAvailableDates([]);
+    };
+
+    const handleDateChange = (date) => {
+        if (!loggedInUser) {
+            setLoginPrompt(true);
+            return;
+        }
+
+        const packageDay = availableDates.find(day => format(new Date(day.day), 'yyyy-MM-dd') === date);
+        setSelectedPackageDay(packageDay);
+        setQuantity(1);
+    };
+
     const toggleFaq = () => {
         const faqContent = document.querySelector('.faq-content');
         faqContent.classList.toggle('show');
@@ -109,31 +141,27 @@ const PackageDetails = () => {
         itineraryContent.classList.toggle('show');
     };
 
-    const handleOfferChange = (event) => {
-        const offerId = event.target.value;
-        const offer = pkg.offers.find(offer => offer.id === parseInt(offerId));
-        setSelectedOffer(offer);
-        setSelectedPackageDay(null);
-        setAvailableDates([]);
-    };
-
-    const handleDateChange = (date) => {
-        const packageDay = availableDates.find(day => format(new Date(day.day), 'yyyy-MM-dd') === date);
-        setSelectedPackageDay(packageDay);
-        setQuantity(1);
-    };
-
     if (!pkg) return <div>Loading...</div>;
 
     return (
         <div className="details-box" style={{ backgroundImage: `url(${MainUrl}/${pkg.image})` }}>
             <Snackbar
-                open={!!errorMessage}
+                open={!!errorMessage || loginPrompt}
                 autoHideDuration={6000}
-                onClose={() => setErrorMessage('')}
+                onClose={() => {
+                    setErrorMessage('');
+                    setLoginPrompt(false);
+                }}
             >
-                <Alert onClose={() => setErrorMessage('')} severity="error" sx={{ width: '100%' }}>
-                    {errorMessage}
+                <Alert 
+                    onClose={() => {
+                        setErrorMessage('');
+                        setLoginPrompt(false);
+                    }} 
+                    severity={loginPrompt ? "warning" : "error"} 
+                    sx={{ width: '100%' }}
+                >
+                    {loginPrompt ? "Please log in to continue." : errorMessage}
                 </Alert>
             </Snackbar>
             <div className="gradient-overlay"></div>
@@ -152,8 +180,8 @@ const PackageDetails = () => {
                 />
                 <hr />
                 <ImageCatalog imageLinks={imageLinks} />
-                <div className="booking-container">
-                    <h2>Book This Package Now!</h2>
+                <div className="booking-offer">
+                    <h2 className="booking-form-title">Book This Package Now!</h2>
                     <TextField
                         select
                         label="Select Offer"
@@ -226,19 +254,7 @@ const PackageDetails = () => {
                     <p>
                         <FaCalendarAlt className="icon" /> <strong>Period:</strong> {pkg.period} days and {pkg.period - 1} nights
                     </p>
-                    <p className="map-container">
-                        <FaMapMarkerAlt className="icon" /> <strong>Location:</strong>
-                        <div
-                            className="map-container"
-                            style={{ borderLeft: "6px solid orange" }}
-                            dangerouslySetInnerHTML={{ __html: pkg.pickup_location }} />
-                    </p>
-                    <p>
-                        <FaVolumeUp className="icon" /> <strong>Languages:</strong> {pkg.languages}
-                    </p>
-                    <p>
-                        <FaUsers className="icon" /> <strong>Minimum age:</strong> {pkg.min_age}
-                    </p>
+
                     <div className="included-excluded-container">
                         <div className="included-excluded-card">
                             <p><strong>Included:</strong></p>
@@ -265,7 +281,10 @@ const PackageDetails = () => {
                         <FaExclamationCircle className="icon" /> <strong>Cancellation policy:</strong> {pkg.cancellation_policy}
                     </p>
                     <p>
-                        <FaExclamationCircle className="icon" /> <strong>Additional info:</strong> {pkg.additional_info}
+                        <FaVolumeUp className="icon" /> <strong>Languages:</strong> {pkg.languages}
+                    </p>
+                    <p>
+                        <FaUsers className="icon" /> <strong>Minimum age:</strong> {pkg.min_age}
                     </p>
                     <div className="itinerary-container">
                         <p className="itinerary-title">
@@ -282,6 +301,13 @@ const PackageDetails = () => {
                             </div>
                         ))}
                     </div>
+                    <p className="map-container">
+                        <FaMapMarkerAlt className="icon" /> <strong>Location:</strong>
+                        <div
+                            className="map-container"
+                            style={{ borderLeft: "6px solid orange" }}
+                            dangerouslySetInnerHTML={{ __html: pkg.pickup_location }} />
+                    </p>
                     <div className="faq-container">
                         <p className="faq-title" onClick={toggleFaq}>
                             FAQs <FaArrowDown className="faq-arrow" />
