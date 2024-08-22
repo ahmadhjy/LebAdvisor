@@ -34,7 +34,7 @@ const ContactUs = () => {
                     allow="geolocation; microphone; camera; fullscreen"
                     src="https://form.jotform.com/242277018965464"
                     frameBorder="0"
-                    scrolling="no"
+                    scrolling="yes"
                 ></iframe>
             </div>
         </div>
