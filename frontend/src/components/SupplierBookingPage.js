@@ -39,7 +39,7 @@ const SupplierBookingPage = () => {
         api.get('/api/supplier/bookings/'),
         api.get('/api/supplier/packagesb/'),
         api.get('/api/supplier/toursb/'),
-        api.get('/api/supplier-dashboard'),
+        api.get('/api/supplier-dashboard/'),
       ]);
 
       setActivityBookings(activitiesResponse.data || []);

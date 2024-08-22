@@ -52,7 +52,7 @@ const Profile = () => {
 
   useEffect(() => {
     // Fetch user data
-    api.get('/users/user')
+    api.get('/users/user/')
       .then((response) => {
         const data = response.data;
         setUserData(data);
