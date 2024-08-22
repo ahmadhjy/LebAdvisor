@@ -9,7 +9,7 @@ from tours.models import TourDay
 from django.urls import reverse
 
 
-host = "http://localhost:8000"
+host = "https://www.lebadvisor.com"
 
 
 class ActivityBooking(models.Model):

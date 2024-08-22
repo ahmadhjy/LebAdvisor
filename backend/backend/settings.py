@@ -29,10 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000"
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
 
 AUTH_USER_MODEL = "users.CustomUser"
 
@@ -58,27 +55,27 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'tinymce',
-    'blog',
+    "tinymce",
+    "blog",
 ]
 
 TINYMCE_DEFAULT_CONFIG = {
-    'height': 360,
-    'width': '100%',
-    'menubar': 'file edit view insert format tools table help',
-    'plugins': 'advlist autolink lists link image charmap print preview hr anchor pagebreak '
-               'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media '
-               'nonbreaking save table contextmenu directionality emoticons template paste textpattern',
-    'toolbar': 'undo redo | formatselect | bold italic strikethrough forecolor backcolor | '
-               'link image media | alignleft aligncenter alignright alignjustify | '
-               'numlist bullist outdent indent | removeformat | code image',
-    'image_advtab': True,
-    'file_picker_types': 'file image media',
-    'automatic_uploads': True,
-    'images_upload_url': '/api/upload-image/',  # This should match the path in `urls.py`
-    'relative_urls': False,
-    'remove_script_host': False,
-    'convert_urls': True,
+    "height": 360,
+    "width": "100%",
+    "menubar": "file edit view insert format tools table help",
+    "plugins": "advlist autolink lists link image charmap print preview hr anchor pagebreak "
+    "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media "
+    "nonbreaking save table contextmenu directionality emoticons template paste textpattern",
+    "toolbar": "undo redo | formatselect | bold italic strikethrough forecolor backcolor | "
+    "link image media | alignleft aligncenter alignright alignjustify | "
+    "numlist bullist outdent indent | removeformat | code image",
+    "image_advtab": True,
+    "file_picker_types": "file image media",
+    "automatic_uploads": True,
+    "images_upload_url": "/api/upload-image/",  # This should match the path in `urls.py`
+    "relative_urls": False,
+    "remove_script_host": False,
+    "convert_urls": True,
 }
 
 MIDDLEWARE = [
@@ -97,7 +94,9 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "build")
+        ],  # This is the path to your React build directory
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -169,7 +168,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build', 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "build", "static")]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 

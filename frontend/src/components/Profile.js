@@ -58,10 +58,10 @@ const Profile = () => {
         setUserData(data);
 
         if (data.user?.is_supplier) {
-          setSelectedLocations([data.profile.location?.id]);
+          setSelectedLocations([data.profile.location?.id || []]);
         } else {
-          setSelectedLocations(data.profile.location?.map((loc) => loc.id) || []);
-          setSelectedPreferences(data.profile.preferences?.map((pref) => pref.id) || []);
+          setSelectedLocations(Array.isArray(data.profile.location) ? data.profile.location.map((loc) => loc.id) : []);
+          setSelectedPreferences(Array.isArray(data.profile.preferences) ? data.profile.preferences.map((pref) => pref.id) : []);
         }
 
         setEmail(data.user?.email || '');
@@ -72,8 +72,13 @@ const Profile = () => {
       });
 
     // Fetch locations and preferences
-    api.get('/api/locations').then((response) => setLocations(response.data));
-    api.get('/api/categories').then((response) => setPreferences(response.data));
+    api.get('/api/locations').then((response) => {
+      setLocations(Array.isArray(response.data) ? response.data : []);
+    });
+
+    api.get('/api/categories').then((response) => {
+      setPreferences(Array.isArray(response.data) ? response.data : []);
+    });
   }, []);
 
   const handleLocationChange = (e) => {
@@ -256,7 +261,7 @@ const Profile = () => {
                     }}
                     label="Select Location"
                   >
-                    {locations.map((location) => (
+                    {Array.isArray(locations) && locations.map((location) => (
                       <MenuItem key={location.id} value={location.id}>
                         {location.name}
                       </MenuItem>
@@ -267,7 +272,7 @@ const Profile = () => {
                 <FormControl component="fieldset" margin="normal">
                   <FormLabel component="legend">Select Locations</FormLabel>
                   <FormGroup>
-                    {locations.slice(0, showAllLocations ? locations.length : 5).map((location) => (
+                    {Array.isArray(locations) && locations.slice(0, showAllLocations ? locations.length : 5).map((location) => (
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -302,7 +307,7 @@ const Profile = () => {
                 <FormControl component="fieldset" margin="normal">
                   <FormLabel component="legend">Select Preferences</FormLabel>
                   <FormGroup>
-                    {preferences.slice(0, showAllPreferences ? preferences.length : 5).map((preference) => (
+                    {Array.isArray(preferences) && preferences.slice(0, showAllPreferences ? preferences.length : 5).map((preference) => (
                       <FormControlLabel
                         control={
                           <Checkbox
