@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const MainUrl = 'https://lebadvisor.com/';
+export const MainUrl = 'https://www.lebadvisor.com/';
 
 const api = axios.create({
   baseURL: MainUrl,
