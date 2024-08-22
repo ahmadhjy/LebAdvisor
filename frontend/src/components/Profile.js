@@ -52,19 +52,24 @@ const Profile = () => {
 
   useEffect(() => {
     // Fetch user data
-    api.get('/users/user').then((response) => {
-      setUserData(response.data);
+    api.get('/users/user')
+      .then((response) => {
+        const data = response.data;
+        setUserData(data);
 
-      if (response.data.user.is_supplier) {
-        setSelectedLocations([response.data.profile.location.id]);
-      } else {
-        setSelectedLocations(response.data.profile.location.map((loc) => loc.id));
-        setSelectedPreferences(response.data.profile.preferences.map((pref) => pref.id));
-      }
+        if (data.user?.is_supplier) {
+          setSelectedLocations([data.profile.location?.id]);
+        } else {
+          setSelectedLocations(data.profile.location?.map((loc) => loc.id) || []);
+          setSelectedPreferences(data.profile.preferences?.map((pref) => pref.id) || []);
+        }
 
-      setEmail(response.data.user.email);
-      setPhone(response.data.user.phone);
-    });
+        setEmail(data.user?.email || '');
+        setPhone(data.user?.phone || '');
+      })
+      .catch((error) => {
+        setErrorMessage('Failed to load user data.');
+      });
 
     // Fetch locations and preferences
     api.get('/api/locations').then((response) => setLocations(response.data));
@@ -122,6 +127,7 @@ const Profile = () => {
     setErrorMessage('');
   };
 
+  // Add a loading check to ensure data is loaded before rendering
   if (!userData) return <div>Loading...</div>;
 
   return (
@@ -143,13 +149,13 @@ const Profile = () => {
                 <FaUser className="icon" /> Account Information
               </Typography>
               <Typography>
-                <FaUser className="icon-inline" /> Username: {userData.user.username}
+                <FaUser className="icon-inline" /> Username: {userData.user?.username}
               </Typography>
               <Typography>
-                <FaEnvelope className="icon-inline" /> Email: {userData.user.email}
+                <FaEnvelope className="icon-inline" /> Email: {userData.user?.email}
               </Typography>
               <Typography>
-                <FaPhone className="icon-inline" /> Phone: {userData.user.phone}
+                <FaPhone className="icon-inline" /> Phone: {userData.user?.phone}
               </Typography>
               <Button
                 onClick={() => setShowEmailChange(!showEmailChange)}
@@ -234,9 +240,9 @@ const Profile = () => {
           <Card className="profile-card">
             <CardContent>
               <Typography variant="h6">
-                <FaMapMarkerAlt className="icon" /> {userData.user.is_supplier ? 'Location' : 'Locations'}
+                <FaMapMarkerAlt className="icon" /> {userData.user?.is_supplier ? 'Location' : 'Locations'}
               </Typography>
-              {userData.user.is_supplier ? (
+              {userData.user?.is_supplier ? (
                 <FormControl fullWidth variant="outlined" margin="normal">
                   <InputLabel>Select Location</InputLabel>
                   <Select
@@ -286,7 +292,7 @@ const Profile = () => {
           </Card>
         </Grid>
 
-        {!userData.user.is_supplier && (
+        {!userData.user?.is_supplier && (
           <Grid item xs={12}>
             <Card className="profile-card">
               <CardContent>
