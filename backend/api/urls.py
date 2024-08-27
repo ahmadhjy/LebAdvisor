@@ -156,7 +156,9 @@ urlpatterns = [
     ),
     path("upload-image/", upload_image, name="upload_image"),
     path("", include(router.urls)),  # This will handle /posts/ and /posts/<int:pk>/
-    path('supplier/bookings-per-month/', bookings_per_month, name='bookings-per-month'),
-    path('supplier/sales-per-month/', sales_per_month, name='sales-per-month'),
-    path('supplier/customers-per-month/', customers_per_month, name='customers-per-month'),
+    path("supplier/bookings-per-month/", bookings_per_month, name="bookings-per-month"),
+    path("supplier/sales-per-month/", sales_per_month, name="sales-per-month"),
+    path(
+        "supplier/customers-per-month/", customers_per_month, name="customers-per-month"
+    ),
 ]
