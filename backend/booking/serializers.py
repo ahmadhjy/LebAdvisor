@@ -32,6 +32,7 @@ class PackageBookingSerializer(ModelSerializer):
             "quantity",
             "created_at",
             "qr_code",
+            "price",
         ]
         read_only_fields = [
             "id",

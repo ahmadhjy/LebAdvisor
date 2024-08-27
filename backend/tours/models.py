@@ -45,6 +45,7 @@ class Tour(models.Model):
                     TourDay.objects.get_or_create(
                         day=current_day,
                         tour_offer=offer,
+                        price=offer.price,
                         defaults={"stock": offer.stock},
                     )
             current_day += timedelta(days=1)

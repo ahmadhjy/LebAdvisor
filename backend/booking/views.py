@@ -41,7 +41,10 @@ def activity_booking_create(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         booking = ActivityBooking.objects.create(
-            period=period, customer=customer, quantity=quantity
+            period=period,
+            customer=customer,
+            quantity=quantity,
+            price=quantity * period.price,
         )
 
         serializer = ActivityBookingSerializer(booking)
@@ -96,7 +99,12 @@ def tour_booking_create(request):
     tourday.stock -= quantity
     tourday.save()
 
-    booking = TourBooking(tourday=tourday, customer=customer, quantity=quantity)
+    booking = TourBooking(
+        tourday=tourday,
+        customer=customer,
+        quantity=quantity,
+        price=quantity * tourday.price,
+    )
     booking.save()
 
     serializer = TourBookingSerializer(booking)
@@ -176,9 +184,12 @@ def package_booking_create(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    totaldays_price = 0
     for day in package_days:
         day.stock -= quantity
         day.save()
+        totaldays_price += day.price
+    medium_price = totaldays_price / len(package_days) or 1
 
     booking = PackageBooking.objects.create(
         package_offer=package_offer,
@@ -186,6 +197,7 @@ def package_booking_create(request):
         start_date=start_date,
         end_date=end_date,
         quantity=quantity,
+        price=medium_price * quantity,
     )
 
     serializer = PackageBookingSerializer(booking)

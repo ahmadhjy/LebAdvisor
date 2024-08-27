@@ -44,6 +44,7 @@ class Package(models.Model):
                         day=current_day,
                         package_offer=offer,
                         stock=offer.stock,
+                        price=offer.price,
                     )
             current_day += timedelta(days=1)
 

@@ -69,6 +69,7 @@ class Activity(models.Model):
                         time_to=period_end_time.time(),
                         stock=offer.stock,
                         activity_offer=offer,
+                        price=offer.price,
                     )
                     period_start_time = period_end_time
                     period_end_time = period_start_time + period_duration
