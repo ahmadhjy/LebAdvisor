@@ -4,6 +4,7 @@ from users.models import Supplier
 from location.models import Location
 from datetime import timedelta
 
+
 class Tour(models.Model):
     featured = models.BooleanField(default=False)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
@@ -68,6 +69,7 @@ class TourOffer(models.Model):
 class TourDay(models.Model):
     day = models.DateField()
     stock = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     tour_offer = models.ForeignKey(TourOffer, on_delete=models.CASCADE)
 
     def __str__(self):

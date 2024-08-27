@@ -47,6 +47,7 @@ class Activity(models.Model):
 
     def __str__(self):
         return self.title
+
     def create_periods(self):
         offers = self.offers.all()  # Use the related name to get the offers
         for offer in offers:
@@ -91,6 +92,7 @@ class Period(models.Model):
     time_from = models.TimeField()
     time_to = models.TimeField()
     stock = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     activity_offer = models.ForeignKey(
         ActivityOffer, on_delete=models.CASCADE, related_name="periods"
     )

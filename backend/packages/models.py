@@ -4,6 +4,7 @@ from categories.models import Category
 from location.models import Location
 from datetime import timedelta
 
+
 class Package(models.Model):
     featured = models.BooleanField(default=False)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
@@ -29,6 +30,7 @@ class Package(models.Model):
     min_age = models.IntegerField(blank=True, null=True)
     cancellation_policy = models.TextField(blank=True, null=True)
     additional_info = models.TextField(blank=True, null=True)
+
     def create_package_days(self):
         if not self.days_off:
             self.days_off = ""
@@ -64,6 +66,7 @@ class PackageOffer(models.Model):
 class PackageDay(models.Model):
     day = models.DateField()
     package_offer = models.ForeignKey(PackageOffer, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
 
     def __str__(self):
