@@ -7,6 +7,7 @@ from booking.views import (
     package_booking_create,
 )
 from dashboard.views import (
+    supplier_offers,
     supplier_dashboard,
     supplier_activity_bookings,
     customer_activity_bookings,
@@ -30,9 +31,25 @@ from activities.views import (
     get_offers_by_activity,
     get_activity,
     get_all_activities,
+    reserve_activity,
+    block_activity_day,
 )
-from packages.views import get_packages, get_package_days, get_package, get_all_packages
-from tours.views import get_tours, get_tour_days, get_tour, get_all_tours
+from packages.views import (
+    get_packages,
+    get_package_days,
+    get_package,
+    get_all_packages,
+    reserve_package,
+    block_package_day,
+)
+from tours.views import (
+    get_tours,
+    get_tour_days,
+    get_tour,
+    get_all_tours,
+    reserve_tour,
+    block_tourday,
+)
 from location.views import get_locations
 from notifications.views import notification_list, mark_notification_as_read
 from .views import latest_items_api, featured_items_api, search, for_you_items
@@ -50,7 +67,14 @@ router.register(r"posts", PostViewSet)
 
 urlpatterns = [
     path("for-you/", for_you_items, name="for_you"),
+    path("reserve-activity/", reserve_activity, name="reserve_activity"),
+    path("block-activity-day/", block_activity_day, name="block_activity_day"),
+    path("reserve-tour/", reserve_tour, name="reserve_tour"),
+    path("block-tour-day/", block_tourday, name="block_tour_day"),
+    path("reserve-package/", reserve_package, name="reserve_package"),
+    path("block-package-day/", block_package_day, name="block_package_day"),
     path("supplier-dashboard/", supplier_dashboard, name="supplier_dashboard"),
+    path("supplier-offers/", supplier_offers, name="supplier_offers"),
     path("all-favorites/", all_favorites, name="all_favorites"),
     path(
         "favorite-activity/<int:activity_id>/",

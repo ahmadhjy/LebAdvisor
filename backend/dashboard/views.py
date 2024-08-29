@@ -24,6 +24,33 @@ from packages.serializers import PackageSerializer
 from collections import defaultdict
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def supplier_offers(request):
+    user = request.user
+    try:
+        supplier = user.supplier
+    except Supplier.DoesNotExist:
+        return Response(
+            {"detail": "You are not authorized to view this information."}, status=403
+        )
+
+    # Fetching the offers related to the supplier
+    activity_offers = Activity.objects.filter(supplier=supplier)
+    tour_offers = Tour.objects.filter(supplier=supplier)
+    package_offers = Package.objects.filter(supplier=supplier)
+
+    activity_serialized = ActivitySerializer(activity_offers, many=True)
+    tour_serialized = TourSerializer(tour_offers, many=True)
+    package_serialized = PackageSerializer(package_offers, many=True)
+
+    data = {
+        "activity_offers": activity_serialized.data,
+        "tour_offers": tour_serialized.data,
+        "package_offers": package_serialized.data,
+    }
+
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -164,19 +191,31 @@ def supplier_dashboard(request):
             ActivityBooking.objects.filter(
                 period__activity_offer__activity__supplier=supplier,
                 period__day=today,
-            ).values_list("customer__user__username", "period__activity_offer__activity__title", "period__time_from")
+            ).values_list(
+                "customer__user__username",
+                "period__activity_offer__activity__title",
+                "period__time_from",
+            )
         )
         + list(
             TourBooking.objects.filter(
                 tourday__tour_offer__tour__supplier=supplier,
                 tourday__day=today,
-            ).values_list("customer__user__username", "tourday__tour_offer__tour__title", "tourday__tour_offer__tour__pickup_time")
+            ).values_list(
+                "customer__user__username",
+                "tourday__tour_offer__tour__title",
+                "tourday__tour_offer__tour__pickup_time",
+            )
         )
         + list(
             PackageBooking.objects.filter(
                 package_offer__package__supplier=supplier,
                 start_date=today,
-            ).values_list("customer__user__username", "package_offer__package__title", "package_offer__package__pickup_time")
+            ).values_list(
+                "customer__user__username",
+                "package_offer__package__title",
+                "package_offer__package__pickup_time",
+            )
         )
     )
 
@@ -451,8 +490,9 @@ def confirm_tour_payment(request, booking_id):
 def fill_missing_months(data, value_key):
     result = {month: 0 for month in range(1, 13)}
     for item in data:
-        result[item['month']] += item[value_key]
+        result[item["month"]] += item[value_key]
     return result
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -461,28 +501,49 @@ def bookings_per_month(request):
     start_of_year = timezone.now().replace(month=1, day=1)
 
     # Aggregating bookings per month for activities
-    activity_bookings = ActivityBooking.objects.filter(
-        period__activity_offer__activity__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month').annotate(count=Count('id')).order_by('month')
+    activity_bookings = (
+        ActivityBooking.objects.filter(
+            period__activity_offer__activity__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month")
+        .annotate(count=Count("id"))
+        .order_by("month")
+    )
 
     # Aggregating bookings per month for packages
-    package_bookings = PackageBooking.objects.filter(
-        package_offer__package__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month').annotate(count=Count('id')).order_by('month')
+    package_bookings = (
+        PackageBooking.objects.filter(
+            package_offer__package__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month")
+        .annotate(count=Count("id"))
+        .order_by("month")
+    )
 
     # Aggregating bookings per month for tours
-    tour_bookings = TourBooking.objects.filter(
-        tourday__tour_offer__tour__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month').annotate(count=Count('id')).order_by('month')
+    tour_bookings = (
+        TourBooking.objects.filter(
+            tourday__tour_offer__tour__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month")
+        .annotate(count=Count("id"))
+        .order_by("month")
+    )
 
     # Combine all bookings data and fill in missing months
-    combined_data = fill_missing_months(list(activity_bookings) + list(package_bookings) + list(tour_bookings), value_key='count')
+    combined_data = fill_missing_months(
+        list(activity_bookings) + list(package_bookings) + list(tour_bookings),
+        value_key="count",
+    )
 
     # Convert dictionary to list of tuples sorted by month
     combined_data_sorted = sorted(combined_data.items())
@@ -497,43 +558,64 @@ def customers_per_month(request):
     start_of_year = timezone.now().replace(month=1, day=1)
 
     # Aggregating customer IDs per month for activities
-    activity_customers = ActivityBooking.objects.filter(
-        period__activity_offer__activity__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month', 'customer__user__id').order_by('month')
+    activity_customers = (
+        ActivityBooking.objects.filter(
+            period__activity_offer__activity__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month", "customer__user__id")
+        .order_by("month")
+    )
 
     # Aggregating customer IDs per month for packages
-    package_customers = PackageBooking.objects.filter(
-        package_offer__package__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month', 'customer__user__id').order_by('month')
+    package_customers = (
+        PackageBooking.objects.filter(
+            package_offer__package__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month", "customer__user__id")
+        .order_by("month")
+    )
 
     # Aggregating customer IDs per month for tours
-    tour_customers = TourBooking.objects.filter(
-        tourday__tour_offer__tour__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).values('month', 'customer__user__id').order_by('month')
+    tour_customers = (
+        TourBooking.objects.filter(
+            tourday__tour_offer__tour__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .values("month", "customer__user__id")
+        .order_by("month")
+    )
 
     # Combine all customer data
-    combined_customers = list(activity_customers) + list(package_customers) + list(tour_customers)
+    combined_customers = (
+        list(activity_customers) + list(package_customers) + list(tour_customers)
+    )
 
     # Use a dictionary to count unique customers per month
     monthly_customers = {}
     for item in combined_customers:
-        month = item['month']
-        customer_id = item['customer__user__id']
+        month = item["month"]
+        customer_id = item["customer__user__id"]
         if month not in monthly_customers:
             monthly_customers[month] = set()
         monthly_customers[month].add(customer_id)
 
     # Convert the set of customer IDs to counts
-    monthly_customer_counts = {month: len(customer_set) for month, customer_set in monthly_customers.items()}
+    monthly_customer_counts = {
+        month: len(customer_set) for month, customer_set in monthly_customers.items()
+    }
 
     # Fill in missing months with 0
-    full_monthly_counts = {month: monthly_customer_counts.get(month, 0) for month in range(1, 13)}
+    full_monthly_counts = {
+        month: monthly_customer_counts.get(month, 0) for month in range(1, 13)
+    }
 
     # Convert to list of tuples sorted by month
     combined_data_sorted = sorted(full_monthly_counts.items())
@@ -548,34 +630,48 @@ def sales_per_month(request):
     start_of_year = timezone.now().replace(month=1, day=1)
 
     # Aggregating sales per month for activities
-    activity_sales = ActivityBooking.objects.filter(
-        period__activity_offer__activity__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).annotate(
-        sales=Sum(F('quantity') * F('period__activity_offer__price'))
-    ).values('month', 'sales').order_by('month')
+    activity_sales = (
+        ActivityBooking.objects.filter(
+            period__activity_offer__activity__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .annotate(sales=Sum(F("quantity") * F("period__activity_offer__price")))
+        .values("month", "sales")
+        .order_by("month")
+    )
 
     # Aggregating sales per month for packages
-    package_sales = PackageBooking.objects.filter(
-        package_offer__package__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).annotate(
-        sales=Sum(F('quantity') * F('package_offer__price'))
-    ).values('month', 'sales').order_by('month')
+    package_sales = (
+        PackageBooking.objects.filter(
+            package_offer__package__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .annotate(sales=Sum(F("quantity") * F("package_offer__price")))
+        .values("month", "sales")
+        .order_by("month")
+    )
 
     # Aggregating sales per month for tours
-    tour_sales = TourBooking.objects.filter(
-        tourday__tour_offer__tour__supplier=supplier,
-        confirmed=True,
-        created_at__gte=start_of_year
-    ).annotate(month=ExtractMonth('created_at')).annotate(
-        sales=Sum(F('quantity') * F('tourday__tour_offer__price'))
-    ).values('month', 'sales').order_by('month')
+    tour_sales = (
+        TourBooking.objects.filter(
+            tourday__tour_offer__tour__supplier=supplier,
+            confirmed=True,
+            created_at__gte=start_of_year,
+        )
+        .annotate(month=ExtractMonth("created_at"))
+        .annotate(sales=Sum(F("quantity") * F("tourday__tour_offer__price")))
+        .values("month", "sales")
+        .order_by("month")
+    )
 
     # Combine all sales data and fill in missing months
-    combined_sales = fill_missing_months(list(activity_sales) + list(package_sales) + list(tour_sales), value_key='sales')
+    combined_sales = fill_missing_months(
+        list(activity_sales) + list(package_sales) + list(tour_sales), value_key="sales"
+    )
 
     # Convert dictionary to list of tuples sorted by month
     combined_sales_sorted = sorted(combined_sales.items())
