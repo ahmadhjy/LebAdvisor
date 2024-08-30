@@ -95,10 +95,7 @@ const Bookings = () => {
                      booking.package_offer?.package?.unit ||
                      'unit';
 
-        const price = booking.period?.activity_offer?.price ||
-                      booking.tourday?.tour_offer?.price ||
-                      booking.package_offer?.price || 0;
-
+        const price = booking.price;
         const day = booking.period?.day ||
                     booking.tourday?.day ||
                     booking.start_date;
@@ -125,7 +122,7 @@ const Bookings = () => {
                 </Typography>
                 <Typography variant="body2" className="booking-info">
                   <FaDollarSign className="icon-inline" />
-                  Price: ${price * booking.quantity}
+                  Price: ${price}
                 </Typography>
                 <Typography variant="body2" className="booking-info">
                   <FaShoppingCart className="icon-inline" />
