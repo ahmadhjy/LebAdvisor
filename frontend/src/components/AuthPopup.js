@@ -9,14 +9,14 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import api from '../services/api.js';
+import api, { MainUrl } from '../services/api.js';
 import './Navbar.css';
 
 const AuthPopup = () => {
 
   const handleLogin = async (username, password) => {
     try {
-      const response = await api.post('/users/login/', { username, password });
+      const response = await api.post(`${MainUrl}/users/login/`, { username, password });
       const { token } = response.data;
       localStorage.setItem('token', token);
       if (response.data.user.is_supplier) localStorage.setItem('s', response.data.user.is_supplier);

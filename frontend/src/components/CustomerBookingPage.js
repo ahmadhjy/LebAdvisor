@@ -57,8 +57,8 @@ const Bookings = () => {
     fetchBookings();
   }, []);
 
-  if (loading) return <Container className="container"><CircularProgress /></Container>;
-  if (error) return <Container className="container"><Alert severity="error">Error loading bookings: {error.message}</Alert></Container>;
+  if (loading) return <Container className="fancy-container"><CircularProgress /></Container>;
+  if (error) return <Container className="fancy-container"><Alert severity="error">Error loading bookings: {error.message}</Alert></Container>;
 
   const filterBookings = (bookings, getDate, getPaid, getConfirmed) => {
     const main = bookings.filter(booking => !getPaid(booking) && isBookingStillValid(getDate(booking)));
@@ -110,40 +110,42 @@ const Bookings = () => {
 
         return (
           <Grid item xs={12} sm={6} md={4} key={booking.id}>
-            <Card className="booking-card">
-              <img 
-                src={`${MainUrl}/${activityImage || tourImage || packageImage}`} 
-                className="booking-image"
-                alt="Booking"
-              />
-              <CardContent className="booking-content">
-                <Typography variant="h5" component="h2" className="booking-info">
+            <Card className="fancy-booking-card">
+              {activityImage || tourImage || packageImage ? (
+                <img 
+                  src={`${MainUrl}/${activityImage || tourImage || packageImage}`} 
+                  className="fancy-booking-image"
+                  alt="Booking"
+                />
+              ) : null}
+              <CardContent className="fancy-booking-content">
+                <Typography variant="h6" component="h2" className="fancy-booking-title">
                   {title}
                 </Typography>
-                <Typography variant="body2" className="booking-info">
-                  <FaDollarSign className="icon-inline" />
-                  Price: ${price}
+                <Typography variant="body2" className="fancy-booking-detail fancy-label">
+                  <FaDollarSign className="icon-inline" /> Price:
+                  <span className="fancy-booking-value"> ${price}</span>
                 </Typography>
-                <Typography variant="body2" className="booking-info">
-                  <FaShoppingCart className="icon-inline" />
-                  Quantity: {booking.quantity} {unit}
+                <Typography variant="body2" className="fancy-booking-detail fancy-label">
+                  <FaShoppingCart className="icon-inline" /> Quantity:
+                  <span className="fancy-booking-value"> {booking.quantity} {unit}</span>
                 </Typography>
-                <Typography variant="body2" className="booking-info">
-                  <FaCalendarAlt className="icon-inline" />
-                  Day: {day}
+                <Typography variant="body2" className="fancy-booking-detail fancy-label">
+                  <FaCalendarAlt className="icon-inline" /> Day:
+                  <span className="fancy-booking-value"> {day}</span>
                 </Typography>
-                <Typography variant="body2" className="booking-info">
-                  <FaClock className="icon-inline" />
-                  Starts at: {startTime}
+                <Typography variant="body2" className="fancy-booking-detail fancy-label">
+                  <FaClock className="icon-inline" /> Starts at:
+                  <span className="fancy-booking-value"> {startTime}</span>
                 </Typography>
-                <Typography variant="body2" className="booking-info">
-                  <FaClock className="icon-inline" />
-                  Ends at: {endTime}
+                <Typography variant="body2" className="fancy-booking-detail fancy-label">
+                  <FaClock className="icon-inline" /> Ends at:
+                  <span className="fancy-booking-value"> {endTime}</span>
                 </Typography>
-                <Typography variant="body1" className={`booking-status ${booking.paid ? 'paid' : 'unpaid'}`}>
+                <Typography variant="body1" className={`fancy-booking-status ${booking.paid ? 'paid' : 'unpaid'}`}>
                   {booking.paid ? <><FaCheck className="icon-inline" /> Paid</> : <><FaTimes className="icon-inline" /> Unpaid</>}
                 </Typography>
-                <Typography variant="body1" className={`booking-status ${booking.confirmed ? 'confirmed' : 'not-confirmed'}`}>
+                <Typography variant="body1" className={`fancy-booking-status ${booking.confirmed ? 'confirmed' : 'not-confirmed'}`}>
                   {booking.confirmed ? <><FaCheck className="icon-inline" /> Confirmed</> : <><FaTimes className="icon-inline" /> Not confirmed</>}
                 </Typography>
                 {booking.confirmed && booking.qr_code && (
@@ -156,15 +158,15 @@ const Bookings = () => {
             </Card>
           </Grid>
         );
-      }) : <Typography className="no-bookings">No bookings available</Typography>}
+      }) : <Typography className="fancy-no-bookings">No bookings available</Typography>}
     </Grid>
   );
 
   return (
-    <Container className="container">
+    <Container className="fancy-container">
       <Grid container spacing={4} direction="column">
         <Grid item>
-          <Card className="booking-card">
+          <Card className="fancy-booking-card-container">
             <CardHeader title={<><FaBookmark className="icon-inline" /> Active Bookings</>} />
             <CardContent>
               {renderBookingList(combinedBookings.main)}
@@ -172,7 +174,7 @@ const Bookings = () => {
           </Card>
         </Grid>
         <Grid item>
-          <Card className="booking-card">
+          <Card className="fancy-booking-card-container">
             <CardHeader title={<><FaHistory className="icon-inline" /> History Bookings</>} />
             <CardContent>
               {renderBookingList(combinedBookings.history)}
@@ -180,7 +182,7 @@ const Bookings = () => {
           </Card>
         </Grid>
         <Grid item>
-          <Card className="booking-card">
+          <Card className="fancy-booking-card-container">
             <CardHeader title={<><FaExclamationTriangle className="icon-inline" /> Expired Bookings</>} />
             <CardContent>
               {renderBookingList(combinedBookings.expired)}

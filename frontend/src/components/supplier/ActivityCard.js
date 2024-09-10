@@ -3,6 +3,7 @@ import { Card, CardContent, Typography, TextField, MenuItem, Button } from '@mui
 import api from '../../services/api';
 import CustomDatePicker from '../booking/CustomDatePicker';
 import PeriodsDropdown from '../booking/PeriodsDropdown';
+import './OfferCard.css';
 
 const ActivityCard = ({ activity }) => {
     const [selectedOffer, setSelectedOffer] = useState(null);
@@ -11,6 +12,7 @@ const ActivityCard = ({ activity }) => {
     const [selectedPeriod, setSelectedPeriod] = useState(null);
     const [stockToReserve, setStockToReserve] = useState(0);
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
 
     const handleOfferChange = async (event) => {
         const offerId = event.target.value;
@@ -19,10 +21,14 @@ const ActivityCard = ({ activity }) => {
         setSelectedPeriod(null);
         setPeriods([]);
         setSelectedDate(null);
+        setSuccessMessage(null);
+        setError(null);
     };
 
     const handleDateChange = async (date) => {
         setSelectedDate(date);
+        setSuccessMessage(null);
+        setError(null);
 
         if (selectedOffer && date) {
             try {
@@ -35,15 +41,16 @@ const ActivityCard = ({ activity }) => {
         }
     };
 
-    const handleReserve = async () => {
+    const handleReserve = async (maxStock = false) => {
         if (selectedOffer && selectedPeriod) {
             try {
+                const number_of_reservations = maxStock ? selectedPeriod.stock : stockToReserve;
                 await api.post('/api/reserve-activity/', {
                     activity_offer: selectedOffer.id,
                     period: selectedPeriod.id,
-                    number_of_reservations: stockToReserve,
+                    number_of_reservations: number_of_reservations,
                 });
-                alert("Reservation successful");
+                setSuccessMessage(maxStock ? "Day blocked successfully" : "Reservation successful");
             } catch (error) {
                 console.error("Error reserving stock", error);
                 setError("Error reserving stock. Please try again.");
@@ -54,9 +61,14 @@ const ActivityCard = ({ activity }) => {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <Typography variant="h5" component="h2">
+        <Card className="offer-card">
+            {activity.image && (
+                <div className="offer-image-container">
+                    <img src={`http://localhost:8000${activity.image}`} alt={activity.title} className="offer-image" />
+                </div>
+            )}
+            <CardContent className="offer-content">
+                <Typography variant="h5" component="h2" className="offer-title">
                     {activity.title}
                 </Typography>
                 <TextField
@@ -70,12 +82,12 @@ const ActivityCard = ({ activity }) => {
                     <MenuItem value="">Select Offer</MenuItem>
                     {activity.offers.map(offer => (
                         <MenuItem key={offer.id} value={offer.id}>
-                            {offer.title} - ${offer.price}
+                            {offer.title}
                         </MenuItem>
                     ))}
                 </TextField>
                 {selectedOffer && (
-                    <>
+                    <div>
                         <CustomDatePicker
                             from={activity.available_from}
                             to={activity.available_to}
@@ -83,13 +95,13 @@ const ActivityCard = ({ activity }) => {
                             onDateChange={handleDateChange}
                         />
                         {selectedDate && periods.length > 0 && (
-                        <PeriodsDropdown
-                            selectedDate={selectedDate}
-                            offerId={selectedOffer.id}
-                            setSelectedPeriod={setSelectedPeriod}
-                            selectedPeriod={selectedPeriod}
-                        />
-                       )}
+                            <PeriodsDropdown
+                                selectedDate={selectedDate}
+                                offerId={selectedOffer.id}
+                                setSelectedPeriod={setSelectedPeriod}
+                                selectedPeriod={selectedPeriod}
+                            />
+                        )}
                         {selectedDate && periods.length === 0 && (
                             <Typography variant="body2" color="textSecondary">
                                 No available periods for the selected date.
@@ -102,23 +114,41 @@ const ActivityCard = ({ activity }) => {
                             onChange={(e) => setStockToReserve(e.target.value)}
                             fullWidth
                             margin="normal"
+                            inputProps={{ max: selectedPeriod?.stock || 0 }}
                             disabled={!selectedPeriod}
                         />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleReserve}
-                            disabled={!selectedPeriod}
-                            fullWidth
-                        >
-                            Reserve Stock
-                        </Button>
+                        <div className="offer-actions">
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => handleReserve()}
+                                disabled={!selectedPeriod}
+                                fullWidth
+                            >
+                                Reserve Stock
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={() => handleReserve(true)}
+                                disabled={!selectedPeriod}
+                                fullWidth
+                                style={{ marginTop: '10px' }}
+                            >
+                                Block Day (Reserve All)
+                            </Button>
+                        </div>
+                        {successMessage && (
+                            <Typography variant="body2" color="primary" className="success-message">
+                                {successMessage}
+                            </Typography>
+                        )}
                         {error && (
-                            <Typography variant="body2" color="error">
+                            <Typography variant="body2" color="error" className="error-message">
                                 {error}
                             </Typography>
                         )}
-                    </>
+                    </div>
                 )}
             </CardContent>
         </Card>

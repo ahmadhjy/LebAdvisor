@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://www.lebadvisor.com/api/posts/';
+const API_URL = 'http://localhost:8000/api/posts/';
 
 class PostService {
   getPosts() {
